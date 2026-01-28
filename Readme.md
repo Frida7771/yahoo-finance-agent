@@ -2,6 +2,42 @@
 
 A FastAPI-based financial assistant powered by OpenAI, LangChain, and Yahoo Finance. Supports natural language queries for real-time stock data and SEC document Q&A.
 
+## Demo
+
+### 💬 Stock Agent - Natural Language Queries
+
+![Stock Agent Demo](demo/stocks.jpg)
+
+**Example Queries:**
+```
+> What's Apple's current stock price?
+> Show me Microsoft's revenue and profit for the last 3 years
+> What do analysts recommend for NVDA?
+> Get Tesla's price history for last month
+```
+
+### 📄 RAG - SEC Document Q&A
+
+![RAG Demo](demo/sec.jpg)
+
+**Example Queries:**
+```
+> What was Microsoft's total revenue in 2025?
+> What are the main risk factors mentioned in the 10-K?
+> Summarize the company's business strategy
+```
+
+### 📊 API Response Example
+
+```json
+{
+  "response": "Apple Inc. (AAPL) current stock information:\n\n- **Current Price:** $258.27\n- **Market Cap:** $3.82 trillion\n- **P/E Ratio:** 34.62\n- **52-Week High:** $288.62\n- **52-Week Low:** $169.21",
+  "conversation_id": "91db28e1-d913-4aa6-b77b-fc7d6f75ceed"
+}
+```
+
+---
+
 ## Features
 
 ### Finance Agent (`/api/chat`)
@@ -32,26 +68,7 @@ A FastAPI-based financial assistant powered by OpenAI, LangChain, and Yahoo Fina
 - **Database**: SQLite (conversation history)
 - **Data Source**: Yahoo Finance (yfinance)
 
-## Project Structure
 
-```
-yahoo-finance-llm-agent/
-├── main.py              # FastAPI entry point
-├── config.py            # Configuration management
-├── database.py          # SQLite database
-├── models.py            # SQLAlchemy models
-├── schemas.py           # Pydantic schemas
-├── agent.py             # LangChain Finance Agent
-├── rag.py               # RAG document Q&A
-├── routes/
-│   ├── chat.py          # /api/chat endpoints
-│   ├── rag.py           # /api/rag endpoints
-│   └── stock.py         # /api/stock endpoints
-├── tools/               # LangChain tools (Yahoo Finance)
-├── documents/           # SEC filings
-├── data/                # SQLite DB + FAISS index
-└── requirements.txt
-```
 
 ## Installation
 
