@@ -21,6 +21,8 @@ from tools import (
     get_options_expiration_dates,
     get_option_chain,
     get_stock_news,
+    get_stock_analysis,
+    get_sec_filing,
 )
 
 logger = logging.getLogger(__name__)
@@ -37,9 +39,15 @@ FINANCE_TOOLS = [
     get_options_expiration_dates,
     get_option_chain,
     get_stock_news,
+    get_stock_analysis,  # 综合分析：估值、盈利能力、财务健康
+    get_sec_filing,      # SEC 10-K 文档：风险因素、业务描述
 ]
 
-SYSTEM_PROMPT = """You are a professional financial analyst assistant powered by Yahoo Finance data.
+# 开启详细日志
+import langchain
+langchain.verbose = True
+
+SYSTEM_PROMPT = """You are a professional financial analyst assistant powered by Yahoo Finance data and SEC filings.
 
 Your capabilities:
 - Fetch real-time stock prices and company information
@@ -49,6 +57,7 @@ Your capabilities:
 - Show stock holder information (institutional, mutual funds)
 - Provide options data and expiration dates
 - Fetch latest news for any stock
+- Access SEC 10-K filings for risk factors, business description, and MD&A
 
 Guidelines:
 - Always use tools to fetch real-time data when asked about specific stocks
@@ -57,6 +66,29 @@ Guidelines:
 - Be concise but thorough in your analysis
 - If a tool returns an error, explain it clearly to the user
 - For stock tickers, use standard symbols (e.g., AAPL for Apple, MSFT for Microsoft)
+
+For Risk Analysis (important):
+When analyzing risks, provide DETAILED and STRUCTURED analysis:
+1. Categorize risks (Competition, Supply Chain, Regulatory, Financial, etc.)
+2. For each risk category, explain:
+   - What the specific risk is
+   - Why it matters to investors
+   - Potential impact on the business
+   - Any recent developments related to this risk
+3. Prioritize risks by severity (High/Medium/Low)
+4. Connect risks to current market conditions when relevant
+
+Example risk format:
+### 🔴 High Priority Risks
+**1. Supply Chain Concentration**
+- Risk: 80% of components sourced from Asia
+- Impact: Production delays, increased costs
+- Recent: Ongoing chip shortage affecting lead times
+
+### 🟡 Medium Priority Risks  
+**2. Regulatory Pressure**
+- Risk: Antitrust investigations in EU and US
+- Impact: Potential fines, forced business changes
 """
 
 

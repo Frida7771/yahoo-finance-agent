@@ -2,8 +2,13 @@
 FastAPI 主入口
 """
 import logging
+import os
 from pathlib import Path
 from contextlib import asynccontextmanager
+
+# ⚠️ 必须在最开始加载 .env，让 LangSmith 能读取环境变量
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent / ".env")
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,6 +35,22 @@ async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     # Startup
     logger.info("Starting Finance Agent API...")
+    
+    # 检查 LangSmith 配置 (支持两种前缀: LANGSMITH_ 和 LANGCHAIN_)
+    tracing = (
+        os.getenv("LANGSMITH_TRACING", "").lower() == "true" or
+        os.getenv("LANGCHAIN_TRACING_V2", "").lower() == "true"
+    )
+    project = os.getenv("LANGSMITH_PROJECT") or os.getenv("LANGCHAIN_PROJECT", "default")
+    api_key = os.getenv("LANGSMITH_API_KEY") or os.getenv("LANGCHAIN_API_KEY", "")
+    
+    if tracing and api_key:
+        logger.info(f"✅ LangSmith tracing ENABLED - Project: {project}")
+    else:
+        logger.warning("⚠️ LangSmith tracing DISABLED - Check env vars")
+        logger.warning(f"   LANGSMITH_TRACING={os.getenv('LANGSMITH_TRACING')}")
+        logger.warning(f"   LANGSMITH_API_KEY={'***' if api_key else 'NOT SET'}")
+    
     await init_db()
     logger.info("Database initialized")
     

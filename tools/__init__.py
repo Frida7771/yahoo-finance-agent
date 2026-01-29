@@ -8,3 +8,5 @@ from .get_recommendations import get_recommendations
 from .get_options import get_options_expiration_dates
 from .get_option_chain import get_option_chain
 from .get_news import get_stock_news
+from .get_analysis import get_stock_analysis
+from .get_sec_filing import get_sec_filing
