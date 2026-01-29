@@ -1,27 +1,34 @@
-# Yahoo Finance LLM Agent
+# 📈 Finance Agent
 
-An AI-powered financial analyst assistant built with FastAPI, LangGraph, and React. Features natural language queries for real-time stock data, comprehensive financial analysis, and dynamic SEC 10-K document retrieval.
+An AI-powered financial analyst assistant built with FastAPI, LangGraph, and React. Features natural language queries, real-time stock data, SEC 10-K document analysis, and live market monitoring.
 
 ## Demo
 
-![Chat Interface Demo](demo/demo1.jpg)
+![Homepage](demo/page.jpg)
 
 ---
 
 ## Features
 
-### 🤖 Finance Agent
+### 🏠 Homepage
+Landing page introducing the Finance Agent with quick navigation to both interfaces.
+
+### 🤖 AI Analysis
 - **Natural Language Queries**: Ask questions like "Analyze Apple's valuation and risks"
-- **Real-time Data**: Fetches live data from Yahoo Finance
-- **Comprehensive Analysis**: Price, valuation metrics (PE, PB, EV/EBITDA), profitability (ROE, margins), financial health
+- **Real-time Data**: Live data from Yahoo Finance (price, financials, valuation metrics)
+- **SEC 10-K Analysis**: Risk factors, legal proceedings, executive compensation, cybersecurity
+- **Query Builder**: Pre-built templates for common analysis requests
 - **LangSmith Integration**: Full observability and tracing
 
-### 📄 Dynamic SEC 10-K Retrieval
-Fetch any section from SEC 10-K filings for **any US public company** in real-time:
-
+### 📊 Real-Time Dashboard
+- **Live Quotes**: WebSocket-powered real-time stock prices via Alpaca
+- **Multiple Watchlists**: Organize stocks by category (Tech, Finance, Custom)
+- **TradingView Charts**: Mini chart widgets for each stock
+- **Price Alerts**: Browser notifications when price targets are hit
+- **Grid/List Views**: Toggle between display modes
 
 ### 🔍 RAG Pipeline
-- **Dynamic Document Ingestion**: Auto-download and cache SEC filings via EDGAR API
+- **Dynamic Document Ingestion**: Auto-download SEC filings via EDGAR API
 - **FAISS Vector Search**: Semantic search with OpenAI embeddings
 - **Auto-refresh**: Detects newer filings and updates cache automatically
 
@@ -31,10 +38,11 @@ Fetch any section from SEC 10-K filings for **any US public company** in real-ti
 
 | Layer | Technology |
 |-------|------------|
-| **Frontend** | React + Vite + Tailwind CSS + shadcn/ui |
+| **Frontend** | React + TypeScript + Vite + Tailwind CSS + shadcn/ui |
 | **Backend** | FastAPI + Python |
 | **Agent** | LangGraph (LangChain 1.x) + OpenAI |
 | **Vector Store** | FAISS + OpenAI Embeddings |
+| **Real-time** | Alpaca WebSocket |
 | **Data Sources** | Yahoo Finance API, SEC EDGAR API |
 
 ---
@@ -44,7 +52,7 @@ Fetch any section from SEC 10-K filings for **any US public company** in real-ti
 ### 1. Setup
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Frida7771/yahoo-finance-agent
 cd yahoo-finance-llm-agent
 
 # Backend
@@ -63,18 +71,22 @@ Create `.env` file:
 ```bash
 OPENAI_API_KEY=your_openai_api_key
 
-# Optional
+# Optional: LangSmith tracing
 LANGSMITH_TRACING=true
 LANGSMITH_API_KEY=your_langsmith_api_key
+
+# Optional: Real-time quotes
+ALPACA_API_KEY=your_alpaca_api_key
+ALPACA_SECRET_KEY=your_alpaca_secret_key
 ```
 
 ### 3. Run
 
 ```bash
-# Backend
-uvicorn main:app --reload --port 8000
+# Terminal 1: Backend
+python main.py
 
-# Frontend (dev mode)
+# Terminal 2: Frontend (dev mode)
 cd frontend && npm run dev
 ```
 
@@ -85,7 +97,6 @@ cd frontend && npm run dev
 | http://localhost:5173 | Frontend (dev) |
 | http://localhost:8000 | Backend API |
 | http://localhost:8000/docs | API Documentation |
-
 
 
 ## License
