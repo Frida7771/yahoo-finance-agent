@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { Sidebar } from '@/components/Sidebar'
 import { ChatMessage, LoadingMessage } from '@/components/ChatMessage'
+import { HomePage } from '@/pages/HomePage'
 import { QuotesPage } from '@/pages/QuotesPage'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent } from '@/components/ui/card'
-import { Send, TrendingUp, BarChart3, FileText } from 'lucide-react'
+import { Send, TrendingUp, BarChart3, FileText, Home } from 'lucide-react'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -18,10 +19,10 @@ interface Conversation {
   messages?: Message[]
 }
 
-type Page = 'chat' | 'quotes'
+type Page = 'home' | 'analysis' | 'quotes'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('chat')
+  const [currentPage, setCurrentPage] = useState<Page>('home')
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -120,11 +121,29 @@ function App() {
     textareaRef.current?.focus()
   }
 
-  // Render quotes page separately
-  if (currentPage === 'quotes') {
-    return <QuotesPage onBack={() => setCurrentPage('chat')} />
+  const navigateToAnalysis = (prefilledQuery?: string) => {
+    if (prefilledQuery) {
+      setInput(prefilledQuery)
+    }
+    setCurrentPage('analysis')
   }
 
+  // Render Home Page
+  if (currentPage === 'home') {
+    return (
+      <HomePage 
+        onNavigateToAnalysis={navigateToAnalysis}
+        onNavigateToQuotes={() => setCurrentPage('quotes')}
+      />
+    )
+  }
+
+  // Render Quotes Page
+  if (currentPage === 'quotes') {
+    return <QuotesPage onBack={() => setCurrentPage('home')} />
+  }
+
+  // Render Analysis Page (Chat)
   return (
     <div className="flex h-screen bg-background">
       <Sidebar
@@ -133,16 +152,25 @@ function App() {
         onNewChat={newChat}
         onSelectConversation={loadConversation}
         onQueryGenerated={handleQueryGenerated}
-        onNavigateToQuotes={() => setCurrentPage('quotes')}
+        onNavigateToHome={() => setCurrentPage('home')}
       />
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header */}
-        <header className="border-b px-6 py-4 flex-shrink-0">
+        <header className="border-b px-6 py-4 flex-shrink-0 flex items-center justify-between">
           <h2 className="font-medium">
             {messages.length > 0 ? 'Chat' : 'New Analysis'}
           </h2>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setCurrentPage('home')}
+            className="gap-2"
+          >
+            <Home className="h-4 w-4" />
+            Home
+          </Button>
         </header>
 
         {/* Messages */}
@@ -194,9 +222,9 @@ function App() {
 function WelcomeScreen() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-      <h1 className="text-3xl font-bold text-primary mb-3">📈 Finance Agent</h1>
+      <h1 className="text-3xl font-bold text-primary mb-3">📈 AI Analysis</h1>
       <p className="text-muted-foreground mb-8 max-w-md">
-        AI-powered stock analysis with real-time data from Yahoo Finance and SEC filings.
+        Ask questions about any stock. Get real-time data, financials, and SEC filings analysis.
       </p>
 
       <div className="grid grid-cols-3 gap-4 max-w-2xl">
@@ -235,4 +263,3 @@ function WelcomeScreen() {
 }
 
 export default App
-

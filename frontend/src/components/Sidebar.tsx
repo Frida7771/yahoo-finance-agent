@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { QueryBuilder } from './QueryBuilder'
-import { Plus, MessageSquare, TrendingUp, LineChart } from 'lucide-react'
+import { Plus, MessageSquare, TrendingUp, Home } from 'lucide-react'
 
 interface Conversation {
   id: string
@@ -14,7 +14,7 @@ interface SidebarProps {
   onNewChat: () => void
   onSelectConversation: (id: string) => void
   onQueryGenerated: (query: string) => void
-  onNavigateToQuotes?: () => void
+  onNavigateToHome?: () => void
 }
 
 export function Sidebar({
@@ -23,30 +23,29 @@ export function Sidebar({
   onNewChat,
   onSelectConversation,
   onQueryGenerated,
-  onNavigateToQuotes,
+  onNavigateToHome,
 }: SidebarProps) {
   return (
     <div className="w-80 border-r bg-card flex flex-col h-screen">
       {/* Logo */}
-      <div className="p-4 border-b">
+      <div className="p-4 border-b flex items-center justify-between">
         <h1 className="text-lg font-semibold text-primary flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
-          Finance Agent
+          AI Analysis
         </h1>
+        {onNavigateToHome && (
+          <Button variant="ghost" size="icon" onClick={onNavigateToHome} title="Back to Home">
+            <Home className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       {/* New Chat Button */}
-      <div className="p-4 space-y-2">
+      <div className="p-4">
         <Button onClick={onNewChat} variant="outline" className="w-full justify-start gap-2">
           <Plus className="h-4 w-4" />
           New Chat
         </Button>
-        {onNavigateToQuotes && (
-          <Button onClick={onNavigateToQuotes} variant="secondary" className="w-full justify-start gap-2">
-            <LineChart className="h-4 w-4" />
-            Real-Time Dashboard
-          </Button>
-        )}
       </div>
 
       {/* Query Builder */}
@@ -80,4 +79,3 @@ export function Sidebar({
     </div>
   )
 }
-
