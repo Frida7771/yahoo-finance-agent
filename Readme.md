@@ -3,13 +3,6 @@
 An AI-powered financial analyst assistant built with FastAPI, LangGraph, and Yahoo Finance. Features natural language queries for real-time stock data, comprehensive financial analysis, and dynamic SEC 10-K document retrieval.
 
 ## Demo
-
-### 📊 Stock Analysis
-![Stock Analysis Demo](demo/stocks.jpg)
-
-### 📄 SEC Filings Query
-![SEC Filings Demo](demo/sec.jpg)
-
 ### 💬 Chat Interface
 ![Chat Interface Demo](demo/demo.jpg)
 
@@ -155,33 +148,6 @@ curl http://localhost:8000/api/stock/AAPL/news
 
 ---
 
-## Project Structure
-
-```
-yahoo-finance-llm-agent/
-├── main.py              # FastAPI entry point
-├── agent.py             # LangGraph Finance Agent
-├── config.py            # Settings & env management
-├── database.py          # SQLAlchemy async setup
-├── models.py            # Database models
-├── schemas.py           # Pydantic schemas
-├── rag.py               # RAG service (FAISS)
-├── tools/               # Yahoo Finance & SEC tools
-│   ├── get_stock_info.py
-│   ├── get_analysis.py
-│   ├── get_sec_filing.py   # Dynamic SEC 10-K
-│   └── ...
-├── routes/              # API routes
-│   ├── chat.py
-│   ├── rag.py
-│   └── stock.py
-├── static/              # Frontend
-│   └── index.html
-├── documents/           # Local SEC docs (optional)
-└── requirements.txt
-```
-
----
 
 ## License
 
