@@ -74,9 +74,9 @@ export function QueryBuilder({ onQueryGenerated }: QueryBuilderProps) {
   }
 
   const quickTemplates = [
-    { label: 'Full Analysis', query: `Give me a comprehensive analysis of ${ticker} including: current price, valuation (PE, PB), profitability (ROE, margins), financial health, analyst recommendations, and key risks.` },
-    { label: 'Compare', query: `Compare ${ticker} with its main competitors. Show valuation metrics, profitability, and growth rates.` },
-    { label: 'Research Report', query: `Create an investment research report for ${ticker}. Include company overview, financial analysis, valuation assessment, risk factors from SEC filings, and investment recommendation.` },
+    { label: '📋 Full Report', query: `Create a detailed investment analysis report for ${ticker}. Include: executive summary with rating, company overview, financial performance with tables, valuation analysis, key risks from SEC filing, analyst consensus, and your investment recommendation.` },
+    { label: '📊 Financials', query: `Show me ${ticker}'s detailed financial analysis: revenue trends, profit margins, ROE, ROA, debt levels, cash flow, and compare key metrics to industry averages.` },
+    { label: '⚠️ Risk Analysis', query: `Analyze ${ticker}'s risk factors in detail from their SEC 10-K filing. Categorize by severity (high/medium/low) and explain the potential impact on investors.` },
   ]
 
   return (
