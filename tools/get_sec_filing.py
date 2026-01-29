@@ -8,13 +8,22 @@ import re
 
 class SECFilingInput(BaseModel):
     ticker: str = Field(..., description="The ticker symbol of the company")
-    section: Literal["risk_factors", "business", "mda", "full"] = Field(
+    section: Literal[
+        "risk_factors",   # Item 1A - Risk Factors
+        "business",       # Item 1 - Business Description
+        "mda",            # Item 7 - Management Discussion & Analysis
+        "legal",          # Item 3 - Legal Proceedings
+        "executives",     # Item 10 - Directors & Executive Officers
+        "compensation",   # Item 11 - Executive Compensation
+        "cybersecurity",  # Item 1C - Cybersecurity (new SEC requirement)
+        "full"            # Full document
+    ] = Field(
         default="risk_factors",
-        description="Section to extract: risk_factors, business, mda (management discussion), or full"
+        description="Section to extract from 10-K filing"
     )
     detail_level: Literal["summary", "detailed"] = Field(
         default="summary",
-        description="summary = categorized key points (~3000 chars), detailed = full section text (~15000 chars)"
+        description="summary = key points (~3000 chars), detailed = full text (~15000 chars)"
     )
 
 
@@ -58,19 +67,35 @@ def get_latest_10k_url(cik: str) -> str:
 def extract_section(text: str, section: str, detail_level: str = "summary") -> str:
     """Extract a specific section from 10-K text with configurable detail level"""
     
-    # Section markers in 10-K
+    # Section markers in 10-K (start_pattern, end_pattern)
     section_patterns = {
         "risk_factors": (
             r"(?:Item\s*1A\.?\s*Risk\s*Factors|RISK\s*FACTORS)",
-            r"(?:Item\s*1B|Item\s*2|UNRESOLVED\s*STAFF)"
+            r"(?:Item\s*1B|Item\s*1C|Item\s*2|UNRESOLVED\s*STAFF)"
         ),
         "business": (
-            r"(?:Item\s*1\.?\s*Business|BUSINESS)",
+            r"(?:Item\s*1\.?\s*Business|PART\s*I.*?BUSINESS)",
             r"(?:Item\s*1A|Risk\s*Factors)"
         ),
         "mda": (
             r"(?:Item\s*7\.?\s*Management|MANAGEMENT.*DISCUSSION)",
             r"(?:Item\s*7A|Item\s*8|QUANTITATIVE)"
+        ),
+        "legal": (
+            r"(?:Item\s*3\.?\s*Legal\s*Proceedings|LEGAL\s*PROCEEDINGS)",
+            r"(?:Item\s*4|MINE\s*SAFETY)"
+        ),
+        "executives": (
+            r"(?:Item\s*10\.?\s*Directors|DIRECTORS.*EXECUTIVE\s*OFFICERS)",
+            r"(?:Item\s*11|EXECUTIVE\s*COMPENSATION)"
+        ),
+        "compensation": (
+            r"(?:Item\s*11\.?\s*Executive\s*Compensation|EXECUTIVE\s*COMPENSATION)",
+            r"(?:Item\s*12|SECURITY\s*OWNERSHIP)"
+        ),
+        "cybersecurity": (
+            r"(?:Item\s*1C\.?\s*Cybersecurity|CYBERSECURITY)",
+            r"(?:Item\s*2|PROPERTIES)"
         ),
     }
     
@@ -194,18 +219,21 @@ def format_risk_factors(text: str) -> str:
 def get_sec_filing(ticker: str, section: str = "risk_factors", detail_level: str = "summary") -> dict:
     """
     Fetch SEC 10-K filing sections for any US public company.
-    Use this when user asks about risk factors, business description, 
-    or management discussion from official SEC documents.
+    Use this for official SEC disclosures: risks, business, legal, executives, etc.
     
     Sections available:
-    - risk_factors: Item 1A - Risk Factors
-    - business: Item 1 - Business Description  
-    - mda: Item 7 - Management Discussion & Analysis
+    - risk_factors: Item 1A - Risk Factors (投资风险)
+    - business: Item 1 - Business Description (业务描述)
+    - mda: Item 7 - Management Discussion & Analysis (管理层分析)
+    - legal: Item 3 - Legal Proceedings (法律诉讼)
+    - executives: Item 10 - Directors & Officers (高管信息)
+    - compensation: Item 11 - Executive Compensation (高管薪酬)
+    - cybersecurity: Item 1C - Cybersecurity Disclosures (网络安全)
     - full: Full document (truncated)
     
     Detail levels:
-    - summary: Categorized key points, cost-effective (~3000 chars)
-    - detailed: Full section text for deep analysis (~15000 chars)
+    - summary: Key points, cost-effective (~3000 chars)
+    - detailed: Full section text (~15000 chars)
     """
     try:
         # Step 1: Get CIK
