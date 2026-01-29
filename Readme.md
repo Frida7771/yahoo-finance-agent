@@ -1,152 +1,91 @@
 # Yahoo Finance LLM Agent
 
-An AI-powered financial analyst assistant built with FastAPI, LangGraph, and Yahoo Finance. Features natural language queries for real-time stock data, comprehensive financial analysis, and dynamic SEC 10-K document retrieval.
+An AI-powered financial analyst assistant built with FastAPI, LangGraph, and React. Features natural language queries for real-time stock data, comprehensive financial analysis, and dynamic SEC 10-K document retrieval.
 
 ## Demo
-### 💬 Chat Interface
-![Chat Interface Demo](demo/demo.jpg)
+
+![Chat Interface Demo](demo/demo1.jpg)
 
 ---
 
 ## Features
 
-### 🤖 Finance Agent (`/api/chat`)
+### 🤖 Finance Agent
 - **Natural Language Queries**: Ask questions like "Analyze Apple's valuation and risks"
 - **Real-time Data**: Fetches live data from Yahoo Finance
 - **Comprehensive Analysis**: Price, valuation metrics (PE, PB, EV/EBITDA), profitability (ROE, margins), financial health
-- **LangSmith Integration**: Full observability and tracing for debugging
+- **LangSmith Integration**: Full observability and tracing
 
 ### 📄 Dynamic SEC 10-K Retrieval
 Fetch any section from SEC 10-K filings for **any US public company** in real-time:
 
-| Section | Description |
-|---------|-------------|
-| `risk_factors` | Item 1A - Investment risk factors |
-| `business` | Item 1 - Business description |
-| `mda` | Item 7 - Management Discussion & Analysis |
-| `legal` | Item 3 - Legal proceedings & lawsuits |
-| `executives` | Item 10 - Directors & executive officers |
-| `compensation` | Item 11 - Executive compensation |
-| `cybersecurity` | Item 1C - Cybersecurity disclosures (2024 new) |
 
-### 📈 Yahoo Finance Tools
-| Tool | Description |
-|------|-------------|
-| `get_stock_info` | Real-time price, market cap, sector |
-| `get_stock_analysis` | Valuation, profitability, financial health metrics |
-| `get_historical_data` | Historical price data |
-| `get_financials` | Income statement, balance sheet, cash flow |
-| `get_stock_news` | Latest news |
-| `get_recommendations` | Analyst ratings & price targets |
-| `get_holders_info` | Institutional & mutual fund holders |
-| `get_stock_actions` | Dividends and splits |
-| `get_options_expiration_dates` | Options expiration dates |
-| `get_option_chain` | Options chain data |
-| `get_sec_filing` | Dynamic SEC 10-K section retrieval |
-
-### 🔍 RAG Document Q&A (`/api/rag`)
-- **Vector Search**: FAISS-powered similarity search on local SEC documents
-- **Source Citations**: Returns relevant document snippets
+### 🔍 RAG Pipeline
+- **Dynamic Document Ingestion**: Auto-download and cache SEC filings via EDGAR API
+- **FAISS Vector Search**: Semantic search with OpenAI embeddings
+- **Auto-refresh**: Detects newer filings and updates cache automatically
 
 ---
 
 ## Tech Stack
 
-| Component | Technology |
-|-----------|------------|
-| **Backend** | FastAPI + Uvicorn |
-| **LLM** | OpenAI GPT-4o / GPT-4o-mini |
-| **Agent Framework** | LangGraph (LangChain 1.x) |
-| **Observability** | LangSmith |
-| **Vector Store** | FAISS |
-| **Database** | SQLite + SQLAlchemy (async) |
-| **Data Source** | Yahoo Finance (`yfinance`) |
-| **SEC Data** | SEC EDGAR API |
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | React + Vite + Tailwind CSS + shadcn/ui |
+| **Backend** | FastAPI + Python |
+| **Agent** | LangGraph (LangChain 1.x) + OpenAI |
+| **Vector Store** | FAISS + OpenAI Embeddings |
+| **Data Sources** | Yahoo Finance API, SEC EDGAR API |
 
 ---
 
-## Installation
+## Quick Start
 
-### 1. Clone & Setup
+### 1. Setup
 
 ```bash
 git clone <your-repo-url>
 cd yahoo-finance-llm-agent
 
+# Backend
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
+source venv/bin/activate
 pip install -r requirements.txt
+
+# Frontend
+cd frontend && npm install
 ```
 
-### 2. Configure Environment
+### 2. Configure
 
-Create a `.env` file:
+Create `.env` file:
 
 ```bash
-# Required
 OPENAI_API_KEY=your_openai_api_key
 
-# Optional - Model selection
-OPENAI_MODEL=gpt-4o-mini
-
-# Optional - LangSmith Tracing (recommended)
+# Optional
 LANGSMITH_TRACING=true
 LANGSMITH_API_KEY=your_langsmith_api_key
-LANGSMITH_PROJECT=finance-agent
 ```
 
 ### 3. Run
 
 ```bash
-# Development (with auto-reload)
+# Backend
 uvicorn main:app --reload --port 8000
 
-# Or use Make
-make dev
+# Frontend (dev mode)
+cd frontend && npm run dev
 ```
 
 ### 4. Access
 
-- **Frontend**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
+| URL | Description |
+|-----|-------------|
+| http://localhost:5173 | Frontend (dev) |
+| http://localhost:8000 | Backend API |
+| http://localhost:8000/docs | API Documentation |
 
----
-
-## API Usage
-
-### Chat with Finance Agent
-
-```bash
-curl -X POST http://localhost:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Analyze AAPL: show me valuation, profitability, and key risks"}'
-```
-
-### Get SEC Filing Section
-
-```bash
-# Risk factors
-curl -X POST http://localhost:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "What are Tesla main risk factors from their SEC filing?"}'
-
-# Executive compensation
-curl -X POST http://localhost:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Show me Microsoft executive compensation from SEC"}'
-```
-
-### Direct Stock API
-
-```bash
-curl http://localhost:8000/api/stock/AAPL
-curl http://localhost:8000/api/stock/AAPL/chart?period=3mo
-curl http://localhost:8000/api/stock/AAPL/news
-```
-
----
 
 
 ## License
