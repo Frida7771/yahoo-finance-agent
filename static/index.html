@@ -15,6 +15,9 @@
             --text-secondary: #a1a1aa;
             --accent: #22d3ee;
             --accent-dim: rgba(34, 211, 238, 0.1);
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --accent-purple: #a78bfa;
             --border: #27272a;
             --success: #4ade80;
             --error: #f87171;
@@ -36,19 +39,20 @@
 
         /* Sidebar */
         .sidebar {
-            width: 280px;
+            width: 320px;
             background: var(--bg-secondary);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             padding: 20px;
+            overflow-y: auto;
         }
 
         .logo {
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--accent);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -69,7 +73,7 @@
             font-size: 0.9rem;
             font-weight: 500;
             transition: all 0.2s;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .new-chat-btn:hover {
@@ -77,29 +81,158 @@
             color: var(--bg-primary);
         }
 
-        .mode-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .mode-tab {
-            flex: 1;
-            padding: 10px;
+        /* Query Builder */
+        .query-builder {
             background: var(--bg-tertiary);
             border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .query-builder h3 {
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .query-builder h3::before {
+            content: "⚡";
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
             border-radius: 6px;
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .info-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .info-tag {
+            padding: 6px 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.7rem;
             color: var(--text-secondary);
             cursor: pointer;
-            font-family: inherit;
-            font-size: 0.8rem;
             transition: all 0.2s;
         }
 
-        .mode-tab.active {
+        .info-tag:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .info-tag.active {
             background: var(--accent-dim);
             border-color: var(--accent);
             color: var(--accent);
+        }
+
+        .info-tag.green { --tag-color: var(--accent-green); }
+        .info-tag.orange { --tag-color: var(--accent-orange); }
+        .info-tag.purple { --tag-color: var(--accent-purple); }
+
+        .info-tag.active.green { background: rgba(74, 222, 128, 0.1); border-color: var(--accent-green); color: var(--accent-green); }
+        .info-tag.active.orange { background: rgba(251, 146, 60, 0.1); border-color: var(--accent-orange); color: var(--accent-orange); }
+        .info-tag.active.purple { background: rgba(167, 139, 250, 0.1); border-color: var(--accent-purple); color: var(--accent-purple); }
+
+        .generate-btn {
+            width: 100%;
+            background: var(--accent);
+            border: none;
+            color: var(--bg-primary);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .generate-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Quick Templates */
+        .templates {
+            margin-bottom: 16px;
+        }
+
+        .templates h4 {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .template-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-bottom: 6px;
+            transition: all 0.2s;
+        }
+
+        .template-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .template-btn span {
+            color: var(--accent);
+        }
+
+        /* Conversations */
+        .conversations-header {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            margin-top: 8px;
         }
 
         .conversations {
@@ -108,11 +241,11 @@
         }
 
         .conversation-item {
-            padding: 12px;
+            padding: 10px 12px;
             border-radius: 6px;
             cursor: pointer;
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             margin-bottom: 4px;
             transition: all 0.2s;
             white-space: nowrap;
@@ -136,7 +269,7 @@
         }
 
         .chat-header {
-            padding: 20px 24px;
+            padding: 16px 24px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -146,14 +279,6 @@
         .chat-header h2 {
             font-size: 1rem;
             font-weight: 500;
-        }
-
-        .mode-badge {
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: var(--accent-dim);
-            color: var(--accent);
         }
 
         .messages {
@@ -206,24 +331,6 @@
         .message.user .message-content {
             background: var(--accent-dim);
             border: 1px solid var(--accent);
-        }
-
-        .message-content pre {
-            background: var(--bg-primary);
-            padding: 12px;
-            border-radius: 6px;
-            overflow-x: auto;
-            margin: 10px 0;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-        }
-
-        .message-content code {
-            font-family: 'JetBrains Mono', monospace;
-            background: var(--bg-tertiary);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.85em;
         }
 
         .message-content strong {
@@ -351,53 +458,36 @@
             color: var(--text-secondary);
             max-width: 500px;
             line-height: 1.6;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
 
-        .example-queries {
+        .feature-cards {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            max-width: 600px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 700px;
         }
 
-        .example-query {
+        .feature-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            padding: 14px 18px;
             border-radius: 10px;
-            cursor: pointer;
+            padding: 16px;
             text-align: left;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            transition: all 0.2s;
         }
 
-        .example-query:hover {
-            border-color: var(--accent);
-            color: var(--text-primary);
-        }
-
-        /* Sources */
-        .sources {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border);
-        }
-
-        .sources-title {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+        .feature-card h4 {
+            font-size: 0.9rem;
             margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .source-item {
+        .feature-card p {
             font-size: 0.75rem;
             color: var(--text-secondary);
-            background: var(--bg-tertiary);
-            padding: 8px 10px;
-            border-radius: 4px;
-            margin-bottom: 4px;
+            margin: 0;
         }
 
         /* Scrollbar */
@@ -421,15 +511,57 @@
         
         <button class="new-chat-btn" onclick="newChat()">+ New Chat</button>
         
-        <div class="mode-tabs">
-            <button class="mode-tab active" data-mode="agent" onclick="switchMode('agent')">
-                📊 Stocks
+        <!-- Query Builder -->
+        <div class="query-builder">
+            <h3>Query Builder</h3>
+            
+            <div class="form-group">
+                <label>Stock Ticker</label>
+                <input type="text" id="ticker-input" placeholder="e.g. AAPL, MSFT, NVDA" value="AAPL">
+            </div>
+            
+            <div class="form-group">
+                <label>📊 Market Data</label>
+                <div class="info-tags">
+                    <span class="info-tag active" data-type="price" onclick="toggleTag(this)">💰 Price</span>
+                    <span class="info-tag green" data-type="financials" onclick="toggleTag(this)">📊 Financials</span>
+                    <span class="info-tag green" data-type="valuation" onclick="toggleTag(this)">📈 Valuation</span>
+                    <span class="info-tag orange" data-type="analysis" onclick="toggleTag(this)">🔍 Analysis</span>
+                    <span class="info-tag orange" data-type="news" onclick="toggleTag(this)">📰 News</span>
+                    <span class="info-tag" data-type="recommendations" onclick="toggleTag(this)">👍 Ratings</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>📄 SEC Filings (10-K)</label>
+                <div class="info-tags">
+                    <span class="info-tag purple" data-type="risks" onclick="toggleTag(this)">⚠️ Risks</span>
+                    <span class="info-tag purple" data-type="business" onclick="toggleTag(this)">🏢 Business</span>
+                    <span class="info-tag purple" data-type="legal" onclick="toggleTag(this)">⚖️ Legal</span>
+                    <span class="info-tag purple" data-type="executives" onclick="toggleTag(this)">👔 Executives</span>
+                    <span class="info-tag purple" data-type="compensation" onclick="toggleTag(this)">💵 Pay</span>
+                    <span class="info-tag purple" data-type="cybersecurity" onclick="toggleTag(this)">🔒 Cyber</span>
+                </div>
+            </div>
+            
+            <button class="generate-btn" onclick="generateQuery()">Generate Query →</button>
+        </div>
+
+        <!-- Quick Templates -->
+        <div class="templates">
+            <h4>📋 Quick Analysis</h4>
+            <button class="template-btn" onclick="useTemplate('full-analysis')">
+                Full analysis of <span id="tmpl-ticker-1">AAPL</span>
             </button>
-            <button class="mode-tab" data-mode="rag" onclick="switchMode('rag')">
-                📄 SEC Docs
+            <button class="template-btn" onclick="useTemplate('compare')">
+                Compare <span id="tmpl-ticker-2">AAPL</span> vs competitors
+            </button>
+            <button class="template-btn" onclick="useTemplate('report')">
+                Investment report for <span id="tmpl-ticker-3">AAPL</span>
             </button>
         </div>
-        
+
+        <div class="conversations-header">Recent Chats</div>
         <div class="conversations" id="conversations">
             <!-- Conversations will be loaded here -->
         </div>
@@ -437,19 +569,27 @@
 
     <main class="main">
         <header class="chat-header">
-            <h2 id="chat-title">New Chat</h2>
-            <span class="mode-badge" id="mode-badge">Stock Agent</span>
+            <h2 id="chat-title">New Analysis</h2>
         </header>
 
         <div class="messages" id="messages">
             <div class="welcome">
                 <h1>📈 Finance Agent</h1>
-                <p>Ask about stocks, financial data, analyst recommendations, or query SEC documents using natural language.</p>
-                <div class="example-queries">
-                    <div class="example-query" onclick="askExample(this)">What's Apple's current stock price?</div>
-                    <div class="example-query" onclick="askExample(this)">Show Microsoft's revenue and profit</div>
-                    <div class="example-query" onclick="askExample(this)">What do analysts recommend for NVDA?</div>
-                    <div class="example-query" onclick="askExample(this)">Get Tesla's price history for last month</div>
+                <p>AI-powered stock analysis with real-time data from Yahoo Finance and SEC filings.</p>
+                
+                <div class="feature-cards">
+                    <div class="feature-card">
+                        <h4>💰 Stock Data</h4>
+                        <p>Real-time prices, historical data, and market metrics</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📊 Financials</h4>
+                        <p>Revenue, profit, ROE, valuation ratios</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📄 SEC 10-K</h4>
+                        <p>Risks, Legal, Executives, Compensation, Cybersecurity</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -459,7 +599,7 @@
                 <div class="input-wrapper">
                     <textarea 
                         id="message-input" 
-                        placeholder="Ask about any stock or financial data..."
+                        placeholder="Ask about any stock... e.g. 'Analyze NVDA's valuation and growth'"
                         rows="1"
                         onkeydown="handleKeyDown(event)"
                     ></textarea>
@@ -471,7 +611,6 @@
 
     <script>
         const API_BASE = '';
-        let currentMode = 'agent';
         let conversationId = null;
         let isLoading = false;
 
@@ -482,6 +621,75 @@
             this.style.height = Math.min(this.scrollHeight, 200) + 'px';
         });
 
+        // Update template tickers when input changes
+        document.getElementById('ticker-input').addEventListener('input', function() {
+            const ticker = this.value.toUpperCase() || 'AAPL';
+            document.getElementById('tmpl-ticker-1').textContent = ticker;
+            document.getElementById('tmpl-ticker-2').textContent = ticker;
+            document.getElementById('tmpl-ticker-3').textContent = ticker;
+        });
+
+        function toggleTag(el) {
+            el.classList.toggle('active');
+        }
+
+        function generateQuery() {
+            const ticker = document.getElementById('ticker-input').value.toUpperCase() || 'AAPL';
+            const activeTags = document.querySelectorAll('.info-tag.active');
+            
+            const typeMap = {
+                // Market Data
+                'price': 'current stock price and trading data',
+                'financials': 'financial statements (revenue, profit, margins)',
+                'valuation': 'valuation metrics (PE, PB, EV/EBITDA)',
+                'analysis': 'comprehensive stock analysis',
+                'news': 'latest news and developments',
+                'recommendations': 'analyst recommendations and price targets',
+                // SEC Filings
+                'risks': 'risk factors from SEC 10-K filing',
+                'business': 'business description from SEC 10-K',
+                'legal': 'legal proceedings and lawsuits from SEC filing',
+                'executives': 'directors and executive officers from SEC filing',
+                'compensation': 'executive compensation from SEC filing',
+                'cybersecurity': 'cybersecurity disclosures from SEC filing'
+            };
+            
+            let parts = [];
+            activeTags.forEach(tag => {
+                const type = tag.dataset.type;
+                if (typeMap[type]) {
+                    parts.push(typeMap[type]);
+                }
+            });
+            
+            let query = '';
+            if (parts.length === 0) {
+                query = `Tell me about ${ticker} stock`;
+            } else if (parts.length === 1) {
+                query = `What is ${ticker}'s ${parts[0]}?`;
+            } else {
+                query = `Analyze ${ticker}: show me ${parts.join(', ')}`;
+            }
+            
+            document.getElementById('message-input').value = query;
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+        }
+
+        function useTemplate(type) {
+            const ticker = document.getElementById('ticker-input').value.toUpperCase() || 'AAPL';
+            
+            const templates = {
+                'full-analysis': `Give me a comprehensive analysis of ${ticker} including: current price, valuation (PE, PB), profitability (ROE, margins), financial health, analyst recommendations, and key risks.`,
+                'compare': `Compare ${ticker} with its main competitors. Show valuation metrics, profitability, and growth rates side by side.`,
+                'report': `Create an investment research report for ${ticker}. Include company overview, financial analysis, valuation assessment, risk factors from SEC filings, and investment recommendation.`
+            };
+            
+            document.getElementById('message-input').value = templates[type] || '';
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+        }
+
         function handleKeyDown(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -489,46 +697,30 @@
             }
         }
 
-        function switchMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.mode === mode);
-            });
-            document.getElementById('mode-badge').textContent = 
-                mode === 'agent' ? 'Stock Agent' : 'SEC Documents';
-            newChat();
-            loadConversations();
-        }
-
         function newChat() {
             conversationId = null;
-            document.getElementById('chat-title').textContent = 'New Chat';
+            document.getElementById('chat-title').textContent = 'New Analysis';
             document.getElementById('messages').innerHTML = `
                 <div class="welcome">
                     <h1>📈 Finance Agent</h1>
-                    <p>${currentMode === 'agent' 
-                        ? 'Ask about stocks, financial data, analyst recommendations using natural language.'
-                        : 'Query SEC documents (10-K filings) using natural language.'}</p>
-                    <div class="example-queries">
-                        ${currentMode === 'agent' ? `
-                            <div class="example-query" onclick="askExample(this)">What's Apple's current stock price?</div>
-                            <div class="example-query" onclick="askExample(this)">Show Microsoft's revenue and profit</div>
-                            <div class="example-query" onclick="askExample(this)">What do analysts recommend for NVDA?</div>
-                            <div class="example-query" onclick="askExample(this)">Get Tesla's price history for last month</div>
-                        ` : `
-                            <div class="example-query" onclick="askExample(this)">What was Microsoft's total revenue in 2025?</div>
-                            <div class="example-query" onclick="askExample(this)">What are the main risk factors?</div>
-                            <div class="example-query" onclick="askExample(this)">Summarize the business overview</div>
-                            <div class="example-query" onclick="askExample(this)">What is the company's strategy?</div>
-                        `}
+                    <p>AI-powered stock analysis with real-time data from Yahoo Finance and SEC filings.</p>
+                    
+                    <div class="feature-cards">
+                        <div class="feature-card">
+                            <h4>💰 Stock Data</h4>
+                            <p>Real-time prices, historical data, and market metrics</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📊 Financials</h4>
+                            <p>Revenue, profit, ROE, valuation ratios</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📄 SEC 10-K</h4>
+                            <p>Risks, Legal, Executives, Compensation, Cybersecurity</p>
+                        </div>
                     </div>
                 </div>
             `;
-        }
-
-        function askExample(el) {
-            document.getElementById('message-input').value = el.textContent;
-            sendMessage();
         }
 
         async function sendMessage() {
@@ -536,7 +728,6 @@
             const message = input.value.trim();
             if (!message || isLoading) return;
 
-            // Clear welcome screen and add user message
             const messagesDiv = document.getElementById('messages');
             if (messagesDiv.querySelector('.welcome')) {
                 messagesDiv.innerHTML = '';
@@ -549,19 +740,13 @@
             isLoading = true;
             document.getElementById('send-btn').disabled = true;
 
-            // Add loading indicator
             const loadingId = addLoading();
 
             try {
-                const endpoint = currentMode === 'agent' ? '/api/chat' : '/api/rag/ask';
-                const body = currentMode === 'agent' 
-                    ? { message, conversation_id: conversationId }
-                    : { question: message, conversation_id: conversationId };
-
-                const response = await fetch(API_BASE + endpoint, {
+                const response = await fetch(API_BASE + '/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
+                    body: JSON.stringify({ message, conversation_id: conversationId })
                 });
 
                 const data = await response.json();
@@ -569,11 +754,9 @@
 
                 if (response.ok) {
                     conversationId = data.conversation_id;
-                    const responseText = data.response || data.answer;
-                    addMessage('assistant', responseText, data.sources);
+                    addMessage('assistant', data.response);
                     
-                    // Update title if new chat
-                    if (document.getElementById('chat-title').textContent === 'New Chat') {
+                    if (document.getElementById('chat-title').textContent === 'New Analysis') {
                         document.getElementById('chat-title').textContent = 
                             message.substring(0, 30) + (message.length > 30 ? '...' : '');
                     }
@@ -591,35 +774,20 @@
             document.getElementById('send-btn').disabled = false;
         }
 
-        function addMessage(role, content, sources = null) {
+        function addMessage(role, content) {
             const messagesDiv = document.getElementById('messages');
             const messageEl = document.createElement('div');
             messageEl.className = `message ${role}`;
             
-            // Format content (basic markdown)
             let formattedContent = content
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\n/g, '<br>')
                 .replace(/^- (.*?)(<br>|$)/gm, '<li>$1</li>')
-                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-                .replace(/###\s*(.*?)(<br>|$)/g, '<strong>$1</strong><br>');
-
-            let sourcesHtml = '';
-            if (sources && sources.length > 0) {
-                sourcesHtml = `
-                    <div class="sources">
-                        <div class="sources-title">📚 Sources</div>
-                        ${sources.map(s => `<div class="source-item">${s}</div>`).join('')}
-                    </div>
-                `;
-            }
+                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
 
             messageEl.innerHTML = `
                 <div class="avatar">${role === 'user' ? '👤' : '🤖'}</div>
-                <div class="message-content">
-                    ${formattedContent}
-                    ${sourcesHtml}
-                </div>
+                <div class="message-content">${formattedContent}</div>
             `;
             
             messagesDiv.appendChild(messageEl);
@@ -652,14 +820,11 @@
 
         async function loadConversations() {
             try {
-                const endpoint = currentMode === 'agent' 
-                    ? '/api/chat/conversations' 
-                    : '/api/rag/conversations';
-                const response = await fetch(API_BASE + endpoint);
+                const response = await fetch(API_BASE + '/api/chat/conversations');
                 const conversations = await response.json();
                 
                 const container = document.getElementById('conversations');
-                container.innerHTML = conversations.map(c => `
+                container.innerHTML = conversations.slice(0, 10).map(c => `
                     <div class="conversation-item ${c.id === conversationId ? 'active' : ''}" 
                          onclick="loadConversation('${c.id}')">
                         ${c.title || 'New Chat'}
@@ -672,10 +837,7 @@
 
         async function loadConversation(id) {
             try {
-                const endpoint = currentMode === 'agent' 
-                    ? `/api/chat/conversations/${id}` 
-                    : `/api/rag/conversations/${id}`;
-                const response = await fetch(API_BASE + endpoint);
+                const response = await fetch(API_BASE + `/api/chat/conversations/${id}`);
                 const conversation = await response.json();
                 
                 conversationId = id;
@@ -699,4 +861,3 @@
     </script>
 </body>
 </html>
-
