@@ -99,7 +99,11 @@ app.include_router(stock.router, prefix="/api/stock", tags=["Stock - Direct Quer
 @app.get("/", tags=["Health"])
 async def root():
     """前端页面"""
-    return FileResponse(STATIC_DIR / "index.html")
+    # 优先使用 Vite 构建的 React 前端
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return {"message": "Frontend not built. Run 'cd frontend && npm run build'"}
 
 
 @app.get("/api", tags=["Health"])
