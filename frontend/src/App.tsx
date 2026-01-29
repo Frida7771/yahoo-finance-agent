@@ -3,10 +3,13 @@ import { Sidebar } from '@/components/Sidebar'
 import { ChatMessage, LoadingMessage } from '@/components/ChatMessage'
 import { HomePage } from '@/pages/HomePage'
 import { QuotesPage } from '@/pages/QuotesPage'
+import { LoginPage } from '@/pages/LoginPage'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent } from '@/components/ui/card'
 import { Send, TrendingUp, BarChart3, FileText, Home } from 'lucide-react'
+import { UserMenu } from '@/components/UserMenu'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -21,8 +24,18 @@ interface Conversation {
 
 type Page = 'home' | 'analysis' | 'quotes'
 
+// Get initial page from URL hash
+function getPageFromHash(): Page {
+  const hash = window.location.hash.slice(1) // Remove #
+  if (hash === 'analysis' || hash === 'quotes') {
+    return hash
+  }
+  return 'home'
+}
+
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('home')
+  const { user, isLoading: authLoading } = useAuth()
+  const [currentPage, setCurrentPage] = useState<Page>(getPageFromHash)
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -30,6 +43,20 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Sync URL hash with current page
+  useEffect(() => {
+    window.location.hash = currentPage === 'home' ? '' : currentPage
+  }, [currentPage])
+
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentPage(getPageFromHash())
+    }
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
   // Load conversations on mount
   useEffect(() => {
@@ -128,6 +155,20 @@ function App() {
     setCurrentPage('analysis')
   }
 
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse text-2xl">📈 Loading...</div>
+      </div>
+    )
+  }
+
+  // Show login page if not authenticated
+  if (!user) {
+    return <LoginPage />
+  }
+
   // Render Home Page
   if (currentPage === 'home') {
     return (
@@ -157,20 +198,23 @@ function App() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Header */}
+        {/* Header - Same style as Dashboard */}
         <header className="border-b px-6 py-4 flex-shrink-0 flex items-center justify-between">
-          <h2 className="font-medium">
-            {messages.length > 0 ? 'Chat' : 'New Analysis'}
-          </h2>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setCurrentPage('home')}
-            className="gap-2"
-          >
-            <Home className="h-4 w-4" />
-            Home
-          </Button>
+          <h1 className="text-xl font-semibold flex items-center gap-2">
+            🤖 AI Analysis
+          </h1>
+          <div className="flex items-center gap-4">
+            <UserMenu />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setCurrentPage('home')}
+              className="gap-2"
+            >
+              <Home className="h-4 w-4" />
+              Home
+            </Button>
+          </div>
         </header>
 
         {/* Messages */}

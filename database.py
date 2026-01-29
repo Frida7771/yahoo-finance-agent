@@ -1,18 +1,20 @@
 """
-数据库连接和初始化
+数据库连接和初始化 (PostgreSQL)
 """
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
-from pathlib import Path
 
 from config import get_settings
 
 settings = get_settings()
 
-# 确保 data 目录存在
-Path("data").mkdir(exist_ok=True)
-
-engine = create_async_engine(settings.database_url, echo=settings.debug)
+# PostgreSQL 连接池配置
+engine = create_async_engine(
+    settings.database_url, 
+    echo=settings.debug,
+    pool_size=5,
+    max_overflow=10
+)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 

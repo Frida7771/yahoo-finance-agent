@@ -27,8 +27,8 @@ class Settings(BaseSettings):
     langchain_api_key: str | None = None
     langchain_project: str = "finance-agent"
     
-    # Database
-    database_url: str = "sqlite+aiosqlite:///./data/finance_agent.db"
+    # Database (PostgreSQL)
+    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/finance_agent"
     
     # RAG
     documents_dir: Path = BASE_DIR / "documents"
@@ -40,6 +40,20 @@ class Settings(BaseSettings):
     alpaca_api_key: str | None = None
     alpaca_secret_key: str | None = None
     alpaca_paper: bool = True  # Use paper trading (free)
+    
+    # Redis (Message Queue for real-time data)
+    redis_url: str = "redis://localhost:6379"
+    redis_stream_name: str = "stock_quotes"
+    redis_consumer_group: str = "quote_consumers"
+    
+    # Google OAuth
+    google_client_id: str | None = None
+    google_client_secret: str | None = None
+    
+    # JWT
+    jwt_secret_key: str = "your-secret-key-change-in-production"
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 60 * 24 * 7  # 7 days
     
     # API
     debug: bool = False

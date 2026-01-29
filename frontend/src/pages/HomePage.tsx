@@ -1,6 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { UserMenu } from '@/components/UserMenu'
 import { 
   TrendingUp, MessageSquare, LineChart, FileText, 
   BarChart3, Zap, Shield, ArrowRight, Github
@@ -74,10 +75,21 @@ const dashboardFeatures = [
 export function HomePage({ onNavigateToAnalysis, onNavigateToQuotes }: HomePageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Top Navigation */}
+      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">📈</span>
+            <span className="font-semibold">Finance Agent</span>
+          </div>
+          <UserMenu />
+        </div>
+      </header>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-        <div className="max-w-6xl mx-auto px-6 py-20">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
+        <div className="max-w-6xl mx-auto px-6 py-16">
           <div className="text-center space-y-6">
             <Badge variant="secondary" className="px-4 py-1">
               <Zap className="h-3 w-3 mr-1" />

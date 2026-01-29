@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -7,8 +7,10 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { 
   TrendingUp, TrendingDown, Wifi, WifiOff, Plus, X, 
   Bell, ArrowUpDown, LayoutGrid, List,
-  ArrowLeft
+  ArrowLeft, Loader2
 } from 'lucide-react'
+import { UserMenu } from '@/components/UserMenu'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface Quote {
   symbol: string
@@ -30,26 +32,53 @@ interface PriceAlert {
 }
 
 interface Watchlist {
+  id: number
   name: string
   symbols: string[]
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
+
 export function QuotesPage({ onBack }: { onBack: () => void }) {
+  const { token } = useAuth()
   const [quotes, setQuotes] = useState<Record<string, Quote>>({})
   const [connected, setConnected] = useState(false)
-  const [watchlists, setWatchlists] = useState<Watchlist[]>([
-    { name: 'Tech', symbols: ['AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META'] },
-    { name: 'Finance', symbols: ['JPM', 'BAC', 'GS', 'MS'] },
-  ])
+  const [watchlists, setWatchlists] = useState<Watchlist[]>([])
   const [activeWatchlist, setActiveWatchlist] = useState(0)
   const [alerts, setAlerts] = useState<PriceAlert[]>([])
   const [newSymbol, setNewSymbol] = useState('')
   const [sortBy, setSortBy] = useState<'symbol' | 'change'>('symbol')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [alertInput, setAlertInput] = useState<{ symbol: string; price: string; direction: 'above' | 'below' }>({ symbol: '', price: '', direction: 'above' })
+  const [showNewWatchlist, setShowNewWatchlist] = useState(false)
+  const [newWatchlistName, setNewWatchlistName] = useState('')
+  const [loading, setLoading] = useState(true)
   const wsRef = useRef<WebSocket | null>(null)
 
   const currentSymbols = watchlists[activeWatchlist]?.symbols || []
+  const currentWatchlistId = watchlists[activeWatchlist]?.id
+
+  // Fetch watchlists from API
+  const fetchWatchlists = useCallback(async () => {
+    if (!token) return
+    try {
+      const res = await fetch(`${API_BASE}/api/watchlists`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setWatchlists(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch watchlists:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [token])
+
+  useEffect(() => {
+    fetchWatchlists()
+  }, [fetchWatchlists])
 
   useEffect(() => {
     connectWebSocket()
@@ -153,25 +182,45 @@ export function QuotesPage({ onBack }: { onBack: () => void }) {
     }
   }
 
-  const addSymbol = () => {
+  const addSymbol = async () => {
     const symbol = newSymbol.toUpperCase().trim()
-    if (symbol && !currentSymbols.includes(symbol)) {
-      setWatchlists(prev => prev.map((wl, i) => 
-        i === activeWatchlist 
-          ? { ...wl, symbols: [...wl.symbols, symbol] }
-          : wl
-      ))
-      subscribeToSymbols([symbol])
-      setNewSymbol('')
+    if (!symbol || !currentWatchlistId || !token || currentSymbols.includes(symbol)) return
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/watchlists/${currentWatchlistId}/symbols/${symbol}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setWatchlists(prev => prev.map((wl, i) => 
+          i === activeWatchlist ? { ...wl, symbols: data.symbols } : wl
+        ))
+        subscribeToSymbols([symbol])
+        setNewSymbol('')
+      }
+    } catch (error) {
+      console.error('Failed to add symbol:', error)
     }
   }
 
-  const removeSymbol = (symbol: string) => {
-    setWatchlists(prev => prev.map((wl, i) =>
-      i === activeWatchlist
-        ? { ...wl, symbols: wl.symbols.filter(s => s !== symbol) }
-        : wl
-    ))
+  const removeSymbol = async (symbol: string) => {
+    if (!currentWatchlistId || !token) return
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/watchlists/${currentWatchlistId}/symbols/${symbol}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setWatchlists(prev => prev.map((wl, i) =>
+          i === activeWatchlist ? { ...wl, symbols: data.symbols } : wl
+        ))
+      }
+    } catch (error) {
+      console.error('Failed to remove symbol:', error)
+    }
   }
 
   const addAlert = () => {
@@ -186,6 +235,51 @@ export function QuotesPage({ onBack }: { onBack: () => void }) {
     }
   }
 
+  const addWatchlist = async () => {
+    const name = newWatchlistName.trim()
+    if (!name || !token || watchlists.some(wl => wl.name.toLowerCase() === name.toLowerCase())) return
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/watchlists`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, symbols: [] })
+      })
+      if (res.ok) {
+        const newWl = await res.json()
+        setWatchlists(prev => [...prev, newWl])
+        setActiveWatchlist(watchlists.length) // Switch to new watchlist
+        setNewWatchlistName('')
+        setShowNewWatchlist(false)
+      }
+    } catch (error) {
+      console.error('Failed to create watchlist:', error)
+    }
+  }
+
+  const deleteWatchlist = async (index: number) => {
+    if (watchlists.length <= 1 || !token) return // Keep at least one watchlist
+    const watchlistId = watchlists[index].id
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/watchlists/${watchlistId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (res.ok) {
+        setWatchlists(prev => prev.filter((_, i) => i !== index))
+        if (activeWatchlist >= index && activeWatchlist > 0) {
+          setActiveWatchlist(activeWatchlist - 1)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete watchlist:', error)
+    }
+  }
+
   const sortedSymbols = [...currentSymbols].sort((a, b) => {
     if (sortBy === 'change') {
       const changeA = quotes[a]?.changePercent || 0
@@ -195,15 +289,26 @@ export function QuotesPage({ onBack }: { onBack: () => void }) {
     return a.localeCompare(b)
   })
 
+  // Show loading state while fetching watchlists
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Loading your watchlists...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-background p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="min-h-screen bg-background">
+      {/* Header - Same style as Analysis page */}
+      <header className="border-b px-6 py-4 flex items-center justify-between sticky top-0 bg-background z-10">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-2xl font-bold">📈 Real-Time Quotes</h1>
+          <h1 className="text-xl font-semibold flex items-center gap-2">
+            📈 Real-Time Dashboard
+          </h1>
           <Badge variant={connected ? 'default' : 'secondary'}>
             {connected ? <><Wifi className="h-3 w-3 mr-1" /> Live</> : <><WifiOff className="h-3 w-3 mr-1" /> Offline</>}
           </Badge>
@@ -214,6 +319,7 @@ export function QuotesPage({ onBack }: { onBack: () => void }) {
             variant="ghost" 
             size="icon"
             onClick={() => setSortBy(sortBy === 'symbol' ? 'change' : 'symbol')}
+            title="Sort"
           >
             <ArrowUpDown className="h-4 w-4" />
           </Button>
@@ -221,30 +327,78 @@ export function QuotesPage({ onBack }: { onBack: () => void }) {
             variant="ghost" 
             size="icon"
             onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+            title={viewMode === 'grid' ? 'List view' : 'Grid view'}
           >
             {viewMode === 'grid' ? <List className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
           </Button>
+          <div className="w-px h-6 bg-border mx-2" />
+          <UserMenu />
+          <div className="w-px h-6 bg-border mx-2" />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onBack}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Home
+          </Button>
         </div>
-      </div>
+      </header>
+
+      <div className="p-6">
 
       <div className="grid grid-cols-12 gap-6">
         {/* Main Content */}
         <div className="col-span-9">
           {/* Watchlist Tabs */}
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-4 items-center">
             {watchlists.map((wl, i) => (
-              <Button
-                key={wl.name}
-                variant={i === activeWatchlist ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveWatchlist(i)}
-              >
-                {wl.name}
-              </Button>
+              <div key={wl.name} className="relative group">
+                <Button
+                  variant={i === activeWatchlist ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setActiveWatchlist(i)}
+                >
+                  {wl.name}
+                </Button>
+                {watchlists.length > 1 && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); deleteWatchlist(i); }}
+                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-destructive-foreground text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                    title="Delete watchlist"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
             ))}
-            <Button variant="ghost" size="sm">
-              <Plus className="h-4 w-4" />
-            </Button>
+            
+            {showNewWatchlist ? (
+              <div className="flex gap-1 items-center">
+                <Input
+                  value={newWatchlistName}
+                  onChange={(e) => setNewWatchlistName(e.target.value)}
+                  placeholder="Name..."
+                  className="h-8 w-24 text-xs"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') addWatchlist()
+                    if (e.key === 'Escape') { setShowNewWatchlist(false); setNewWatchlistName(''); }
+                  }}
+                  autoFocus
+                />
+                <Button size="sm" variant="ghost" onClick={addWatchlist} className="h-8 px-2">
+                  ✓
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => { setShowNewWatchlist(false); setNewWatchlistName(''); }} className="h-8 px-2">
+                  ×
+                </Button>
+              </div>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={() => setShowNewWatchlist(true)}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
           {/* Add Symbol */}
@@ -462,6 +616,7 @@ export function QuotesPage({ onBack }: { onBack: () => void }) {
             </CardContent>
           </Card>
         </div>
+      </div>
       </div>
     </div>
   )
