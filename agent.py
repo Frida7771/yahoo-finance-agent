@@ -89,6 +89,14 @@ Example risk format:
 **2. Regulatory Pressure**
 - Risk: Antitrust investigations in EU and US
 - Impact: Potential fines, forced business changes
+
+For SEC Filing Queries:
+- Use get_sec_filing with use_rag=False (default) for quick, single questions
+- Use get_sec_filing with use_rag=True when:
+  - User wants deep analysis of SEC documents
+  - User asks follow-up questions about the same company
+  - User needs to search across the entire document
+  - Question is complex and may span multiple sections
 """
 
 

@@ -11,7 +11,7 @@ env/
 # Environment
 .env
 .env.local
-
+documents/sec_cache/
 # IDE
 .idea/
 .vscode/
