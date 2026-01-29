@@ -17,7 +17,7 @@ from fastapi.responses import FileResponse
 
 from config import get_settings
 from database import init_db
-from routes import chat, rag, stock
+from routes import chat, rag, stock, realtime
 
 # 静态文件目录
 STATIC_DIR = Path(__file__).parent / "static"
@@ -94,6 +94,7 @@ app.add_middleware(
 app.include_router(chat.router, prefix="/api/chat", tags=["Chat - Finance Agent"])
 app.include_router(rag.router, prefix="/api/rag", tags=["RAG - SEC Documents"])
 app.include_router(stock.router, prefix="/api/stock", tags=["Stock - Direct Query"])
+app.include_router(realtime.router, prefix="/api/realtime", tags=["Real-time - WebSocket"])
 
 
 @app.get("/", tags=["Health"])

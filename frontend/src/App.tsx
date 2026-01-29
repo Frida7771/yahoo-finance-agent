@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Sidebar } from '@/components/Sidebar'
 import { ChatMessage, LoadingMessage } from '@/components/ChatMessage'
+import { QuotesPage } from '@/pages/QuotesPage'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent } from '@/components/ui/card'
@@ -17,7 +18,10 @@ interface Conversation {
   messages?: Message[]
 }
 
+type Page = 'chat' | 'quotes'
+
 function App() {
+  const [currentPage, setCurrentPage] = useState<Page>('chat')
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -116,6 +120,11 @@ function App() {
     textareaRef.current?.focus()
   }
 
+  // Render quotes page separately
+  if (currentPage === 'quotes') {
+    return <QuotesPage onBack={() => setCurrentPage('chat')} />
+  }
+
   return (
     <div className="flex h-screen bg-background">
       <Sidebar
@@ -124,6 +133,7 @@ function App() {
         onNewChat={newChat}
         onSelectConversation={loadConversation}
         onQueryGenerated={handleQueryGenerated}
+        onNavigateToQuotes={() => setCurrentPage('quotes')}
       />
 
       {/* Main Chat Area */}

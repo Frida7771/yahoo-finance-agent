@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { QueryBuilder } from './QueryBuilder'
-import { Plus, MessageSquare, TrendingUp } from 'lucide-react'
+import { Plus, MessageSquare, TrendingUp, LineChart } from 'lucide-react'
 
 interface Conversation {
   id: string
@@ -14,6 +14,7 @@ interface SidebarProps {
   onNewChat: () => void
   onSelectConversation: (id: string) => void
   onQueryGenerated: (query: string) => void
+  onNavigateToQuotes?: () => void
 }
 
 export function Sidebar({
@@ -22,6 +23,7 @@ export function Sidebar({
   onNewChat,
   onSelectConversation,
   onQueryGenerated,
+  onNavigateToQuotes,
 }: SidebarProps) {
   return (
     <div className="w-80 border-r bg-card flex flex-col h-screen">
@@ -34,11 +36,17 @@ export function Sidebar({
       </div>
 
       {/* New Chat Button */}
-      <div className="p-4">
+      <div className="p-4 space-y-2">
         <Button onClick={onNewChat} variant="outline" className="w-full justify-start gap-2">
           <Plus className="h-4 w-4" />
           New Chat
         </Button>
+        {onNavigateToQuotes && (
+          <Button onClick={onNavigateToQuotes} variant="secondary" className="w-full justify-start gap-2">
+            <LineChart className="h-4 w-4" />
+            Real-Time Dashboard
+          </Button>
+        )}
       </div>
 
       {/* Query Builder */}

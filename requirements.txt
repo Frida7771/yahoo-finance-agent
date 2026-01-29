@@ -27,6 +27,10 @@ faiss-cpu>=1.7.4
 # Yahoo Finance
 yfinance>=0.2.36
 
+# Real-time Data (Alpaca)
+alpaca-py>=0.21.0
+websockets>=12.0
+
 # Utils
 python-dotenv>=1.0.0
 beautifulsoup4>=4.12.0

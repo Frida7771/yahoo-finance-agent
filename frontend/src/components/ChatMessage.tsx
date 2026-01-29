@@ -13,7 +13,7 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
   const formatContent = (text: string) => {
     return text
       .split('\n')
-      .map((line, i) => {
+      .map((line) => {
         // Bold
         line = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>')
         // Headers
