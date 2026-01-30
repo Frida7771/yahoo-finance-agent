@@ -6,7 +6,7 @@ An AI-powered financial analyst assistant built with FastAPI, LangGraph, and Rea
 
 | Homepage | Real-Time Dashboard |
 |----------|---------------------|
-| ![Homepage](demo/page.jpg) | ![Dashboard](demo/dashboard.jpg) |
+| ![Homepage](demo/AI.jpg) | ![Dashboard](demo/dashboard.jpg) |
 
 
 ---
