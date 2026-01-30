@@ -80,7 +80,7 @@ export function HomePage({ onNavigateToAnalysis, onNavigateToQuotes }: HomePageP
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">📈</span>
-            <span className="font-semibold">Finance Agent</span>
+            <span className="font-semibold">QuantBrains</span>
           </div>
           <UserMenu />
         </div>
@@ -233,7 +233,7 @@ export function HomePage({ onNavigateToAnalysis, onNavigateToQuotes }: HomePageP
       {/* Footer */}
       <footer className="border-t py-8">
         <div className="max-w-6xl mx-auto px-6 flex justify-between items-center text-sm text-muted-foreground">
-          <p>© 2025 Finance Agent. For educational purposes only.</p>
+          <p>© 2025 QuantBrains. For educational purposes only.</p>
           <a 
             href="https://github.com/Frida7771/yahoo-finance-agent" 
             target="_blank" 

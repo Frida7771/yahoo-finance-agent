@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # LangSmith (可选)
     langchain_tracing_v2: bool = False
     langchain_api_key: str | None = None
-    langchain_project: str = "finance-agent"
+    langchain_project: str = "quantbrains"
     
     # Database (PostgreSQL)
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/finance_agent"
@@ -58,6 +58,10 @@ class Settings(BaseSettings):
     # API
     debug: bool = False
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+    
+    # 用量限制
+    free_ai_limit: int = 1  # 免费用户 AI 分析次数限制
+    free_ai_reset_hours: int = 24  # 重置周期 (小时)
 
 
 @lru_cache

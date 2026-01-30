@@ -17,8 +17,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-const TOKEN_KEY = 'finance_agent_token'
-const USER_KEY = 'finance_agent_user'
+const TOKEN_KEY = 'quantbrains_token'
+const USER_KEY = 'quantbrains_user'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)

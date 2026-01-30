@@ -1,4 +1,4 @@
-# 📈 Finance Agent
+# 📈 QuantBrains
 
 An AI-powered financial analyst assistant built with FastAPI, LangGraph, and React. Features natural language queries, real-time stock data, SEC 10-K document analysis, and personalized watchlists.
 

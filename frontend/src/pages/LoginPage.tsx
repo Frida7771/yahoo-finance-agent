@@ -28,7 +28,7 @@ export function LoginPage() {
             <div className="flex items-center gap-3">
               <span className="text-5xl">📈</span>
               <div>
-                <h1 className="text-4xl font-bold">Finance Agent</h1>
+                <h1 className="text-4xl font-bold">QuantBrains</h1>
                 <p className="text-muted-foreground">AI-Powered Financial Analysis</p>
               </div>
             </div>
@@ -66,7 +66,7 @@ export function LoginPage() {
         <Card className="shadow-2xl shadow-primary/10 border-primary/20">
           <CardContent className="p-8 space-y-6">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-semibold">Welcome Back</h2>
+              <h2 className="text-2xl font-semibold">Welcome</h2>
               <p className="text-muted-foreground">
                 Sign in to access your personalized financial dashboard
               </p>
@@ -101,7 +101,7 @@ export function LoginPage() {
 
       {/* Footer */}
       <footer className="absolute bottom-4 text-center text-xs text-muted-foreground">
-        © 2025 Finance Agent • Built with FastAPI, React & LangChain
+        © 2025 QuantBrains • Built with FastAPI, React & LangChain
       </footer>
     </div>
   )

@@ -23,6 +23,11 @@ class User(Base):
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
     
+    # 用量限制
+    is_premium: Mapped[bool] = mapped_column(Boolean, default=False)  # 付费用户
+    ai_usage_count: Mapped[int] = mapped_column(default=0)  # AI 分析使用次数
+    ai_usage_reset_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)  # 重置时间
+    
     conversations: Mapped[list["Conversation"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan"

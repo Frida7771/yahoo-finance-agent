@@ -147,20 +147,36 @@ class AlpacaReader:
         redis = await get_redis()
         settings = self.settings
         reconnect_delay = 5
+        max_reconnect_delay = 60  # Cap at 60 seconds
+        consecutive_failures = 0
         
         while True:
             try:
                 if not self.ws or not self.running:
-                    logger.info("Reconnecting to Alpaca...")
+                    # Check if market is likely closed (reduce log spam)
+                    if consecutive_failures > 3:
+                        logger.info(f"Multiple connection failures. Market may be closed. Retrying in {reconnect_delay}s...")
+                    else:
+                        logger.info("Reconnecting to Alpaca...")
+                    
                     await asyncio.sleep(reconnect_delay)
                     connected = await self._connect()
-                    if connected and subscribed_symbols:
-                        await self.subscribe(list(subscribed_symbols))
+                    
+                    if connected:
+                        consecutive_failures = 0
+                        reconnect_delay = 5  # Reset delay
+                        if subscribed_symbols:
+                            await self.subscribe(list(subscribed_symbols))
+                    else:
+                        consecutive_failures += 1
+                        # Exponential backoff, capped at max_reconnect_delay
+                        reconnect_delay = min(reconnect_delay * 1.5, max_reconnect_delay)
                     continue
                 
-                # Read message from Alpaca
-                message = await self.ws.recv()
+                # Read message from Alpaca (with timeout)
+                message = await asyncio.wait_for(self.ws.recv(), timeout=30)
                 data = json.loads(message)
+                consecutive_failures = 0  # Reset on successful message
                 
                 # Publish to Redis Stream or broadcast directly
                 if redis:
@@ -174,12 +190,26 @@ class AlpacaReader:
                     # Fallback: broadcast directly (in-memory mode)
                     await broadcast(data)
                     
+            except asyncio.TimeoutError:
+                # No data received for 30s - likely market closed or no subscriptions
+                if subscribed_symbols:
+                    logger.debug("No data received (market may be closed)")
+                continue
             except asyncio.CancelledError:
                 logger.info("Alpaca reader cancelled")
                 break
             except Exception as e:
-                logger.warning(f"Alpaca reader error: {e}")
+                error_msg = str(e)
+                # Reduce log spam for known disconnection errors
+                if "no close frame" in error_msg or "connection closed" in error_msg.lower():
+                    if consecutive_failures == 0:
+                        logger.warning(f"Alpaca connection lost: {e}")
+                else:
+                    logger.warning(f"Alpaca reader error: {e}")
+                
                 self.running = False
+                consecutive_failures += 1
+                reconnect_delay = min(reconnect_delay * 1.5, max_reconnect_delay)
                 await asyncio.sleep(reconnect_delay)
     
     async def close(self):

@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent } from '@/components/ui/card'
 import { Send, TrendingUp, BarChart3, FileText, Home } from 'lucide-react'
 import { UserMenu } from '@/components/UserMenu'
+import { UsageQuota, useUsageQuota } from '@/components/UsageQuota'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface Message {
@@ -34,7 +35,8 @@ function getPageFromHash(): Page {
 }
 
 function App() {
-  const { user, isLoading: authLoading } = useAuth()
+  const { user, token, isLoading: authLoading } = useAuth()
+  const { usage, refetch: refetchUsage } = useUsageQuota()
   const [currentPage, setCurrentPage] = useState<Page>(getPageFromHash)
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
@@ -43,6 +45,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  
+  // 检查是否有剩余额度
+  const hasQuota = usage?.is_premium || (usage?.remaining ?? 0) > 0
 
   // Sync URL hash with current page
   useEffect(() => {
@@ -104,6 +109,15 @@ function App() {
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return
+    
+    // 检查是否有额度
+    if (!hasQuota) {
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: '⚠️ You have used your free AI analysis. Upgrade to Premium for unlimited access!' 
+      }])
+      return
+    }
 
     const userMessage = input.trim()
     setInput('')
@@ -113,7 +127,10 @@ function App() {
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           message: userMessage,
           conversation_id: currentConversationId,
@@ -126,6 +143,16 @@ function App() {
         setCurrentConversationId(data.conversation_id)
         setMessages(prev => [...prev, { role: 'assistant', content: data.response }])
         loadConversations()
+        refetchUsage() // 刷新额度显示
+      } else if (res.status === 429) {
+        // 额度用尽
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: `⚠️ ${data.detail || 'Free usage limit reached. Upgrade to Premium for unlimited access!'}` 
+        }])
+        refetchUsage()
+      } else if (res.status === 401) {
+        setMessages(prev => [...prev, { role: 'assistant', content: '⚠️ Please login to use AI analysis.' }])
       } else {
         setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${data.detail || 'Something went wrong'}` }])
       }
@@ -200,9 +227,12 @@ function App() {
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header - Same style as Dashboard */}
         <header className="border-b px-6 py-4 flex-shrink-0 flex items-center justify-between">
-          <h1 className="text-xl font-semibold flex items-center gap-2">
-            🤖 AI Analysis
-          </h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-semibold flex items-center gap-2">
+              🤖 AI Analysis
+            </h1>
+            <UsageQuota />
+          </div>
           <div className="flex items-center gap-4">
             <UserMenu />
             <Button 
@@ -243,16 +273,21 @@ function App() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask about any stock... e.g. 'Analyze NVDA's valuation and risks'"
-                className="w-full bg-secondary border border-border rounded-xl px-4 py-3 pr-12 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-ring min-h-[48px] max-h-[200px]"
+                placeholder={hasQuota 
+                  ? "Ask about any stock... e.g. 'Analyze NVDA's valuation and risks'" 
+                  : "⚠️ Free limit reached. Upgrade to Premium for unlimited access."
+                }
+                disabled={!hasQuota}
+                className={`w-full bg-secondary border border-border rounded-xl px-4 py-3 pr-12 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-ring min-h-[48px] max-h-[200px] ${!hasQuota ? 'opacity-50 cursor-not-allowed' : ''}`}
                 rows={1}
               />
             </div>
             <Button
               onClick={sendMessage}
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || !input.trim() || !hasQuota}
               size="icon"
               className="h-12 w-12 rounded-xl"
+              title={!hasQuota ? 'Upgrade to Premium for more AI analysis' : 'Send message'}
             >
               <Send className="h-4 w-4" />
             </Button>

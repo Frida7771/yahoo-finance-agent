@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     # Startup
-    logger.info("Starting Finance Agent API...")
+    logger.info("Starting QuantBrains API...")
     
     # 检查 LangSmith 配置 (支持两种前缀: LANGSMITH_ 和 LANGCHAIN_)
     tracing = (
@@ -57,13 +57,13 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown
-    logger.info("Shutting down Finance Agent API...")
+    logger.info("Shutting down QuantBrains API...")
 
 
 settings = get_settings()
 
 app = FastAPI(
-    title="Finance Agent API",
+    title="QuantBrains API",
     description="""
 Yahoo Finance LLM Agent API
 
@@ -113,7 +113,7 @@ async def root():
 async def api_info():
     """API 信息"""
     return {
-        "message": "Finance Agent API",
+        "message": "QuantBrains API",
         "version": "0.1.0",
         "docs": "/docs",
     }
